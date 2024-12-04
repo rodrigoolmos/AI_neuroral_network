@@ -1,0 +1,6 @@
+build/
+.vscode/
+TFM_documentos/
+export*/
+pcie_axi_lite_IP/
+*.xmls
