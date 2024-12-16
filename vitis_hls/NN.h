@@ -1,11 +1,13 @@
 #include <stdint.h>
 
-#define N_NEURONS 1000
 #define MAX_FEATURES 32
+#define N_LAYERS 3
+#define N_WEIGHTS MAX_FEATURES
+#define N_NEURONS MAX_FEATURES
 
 struct NN {
-    float weights[N_NEURONS];
-    float offsets[N_NEURONS];
+    float weights[N_LAYERS][N_NEURONS][N_WEIGHTS];
+    float offsets[N_LAYERS][N_NEURONS];
 };
 
 

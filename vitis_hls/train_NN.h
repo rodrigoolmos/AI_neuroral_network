@@ -4,10 +4,10 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
 #include <float.h>
 #include <limits.h>
-#include <omp.h>
 #include "NN.h"
 #include "common.h"
 
@@ -23,7 +23,7 @@ void mutate_population(struct NN neurons[POPULATION], float population_accuracy[
                         uint8_t n_features, float mutation_factor);
 
 void evaluate_model(struct NN neurons, 
-                    struct feature *features, int read_samples, 
+                    struct feature *features, int read_samples, uint32_t n_layers, 
                     float *accuracy, uint8_t sow_log, uint32_t used_features);
 
 void show_logs(float population_accuracy[POPULATION]);
@@ -32,3 +32,5 @@ void reorganize_population(float population_accuracy[POPULATION], struct NN neur
 
 void find_max_min_features(struct feature features[MAX_TEST_SAMPLES],
                                 float max_features[N_FEATURE], float min_features[N_FEATURE]);
+
+void shuffle(struct feature* array, int n);
