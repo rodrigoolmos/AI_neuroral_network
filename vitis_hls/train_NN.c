@@ -1,13 +1,11 @@
 #include "train_NN.h"
 
 float generate_random_float(float min, float max) {
-    float random = (float)rand() / RAND_MAX;
-
+    float random = (float)rand() / (float)RAND_MAX; // Valor entre 0 y 1
     float distance = max - min;
-    float step = distance * 0.01; // 1% de la distancia
-
-    return min + round(random * (distance / step)) * step; // Multiplicamos por step para ajustar el paso
+    return min + random * distance; 
 }
+
 
 void swapf(float *a, float *b) {
     float temp = *a;
@@ -81,7 +79,7 @@ void generate_rando_NN(struct NN neurons[POPULATION],
                         neurons[population_i].weights[layers_i][nodes_i][weight_i] = generate_random_float(-0.1, 0.1);
                     }
                 }
-                neurons[population_i].offsets[layers_i][weight_i] = generate_random_float(-10, 10);
+                neurons[population_i].offsets[layers_i][nodes_i] = generate_random_float(-10, 10);
             }
         }
     }
@@ -124,19 +122,58 @@ void generate_rando_NN(struct NN neurons[POPULATION],
     }
  }
 
+ void tune_NN(struct NN *neurons_input, struct NN *neurons_output,
+                  uint8_t n_features, float mutation_rate, float max_features[N_FEATURE], 
+                  float min_features[N_FEATURE]) {
+
+    uint32_t mutation_threshold = mutation_rate * RAND_MAX;
+    uint32_t mutation_value;
+    uint32_t weight_i;
+    uint32_t nodes_i;
+    uint32_t layers_i;
+    float actual_value;
+    memcpy(neurons_output, neurons_input, sizeof(struct NN));
+
+    for (layers_i = 1; layers_i < N_LAYERS; layers_i++){
+        for (nodes_i = 0; nodes_i < n_features; nodes_i++){
+            mutation_value = rand();
+            if (mutation_value < mutation_threshold){
+                for (weight_i = 0; weight_i < n_features; weight_i++){
+                    
+                    actual_value = neurons_output->weights[layers_i][nodes_i][weight_i];
+
+                    neurons_output->weights[layers_i][nodes_i][weight_i] += 
+                            generate_random_float(actual_value, actual_value);
+                }
+               
+                actual_value = neurons_output->offsets[layers_i][nodes_i];
+                neurons_output->offsets[layers_i][nodes_i] += 
+                            generate_random_float(actual_value, actual_value);
+            }
+        }
+    }
+ }
+
 void mutate_population(struct NN neurons[POPULATION], float population_accuracy[POPULATION], 
                         float max_features[N_FEATURE], float min_features[N_FEATURE], 
                         uint8_t n_features, float mutation_factor){
 
-    uint32_t mutation_part = POPULATION/8;
+    uint32_t mutation_part = POPULATION/4;
+
 
     for (uint32_t p = mutation_part; p < POPULATION; p++) {
         int index_elite = rand() % (mutation_part);
+        int threshold = (int)((mutation_part/2)* population_accuracy[index_elite]);
 
-        mutate_NN(&neurons[index_elite], &neurons[p], n_features, 
-                    1 - population_accuracy[p], max_features, min_features);
-
+        if (index_elite < threshold){
+            tune_NN(&neurons[index_elite], &neurons[p], n_features, 
+                        1 - population_accuracy[p] - 0.6, max_features, min_features);            
+        }else{
+            mutate_NN(&neurons[index_elite], &neurons[p], n_features, 
+                        1 - population_accuracy[p], max_features, min_features);
+        }
     }
+
 }
 
 void swap_features(struct feature* a, struct feature* b) {
