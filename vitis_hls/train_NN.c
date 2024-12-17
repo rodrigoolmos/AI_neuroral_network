@@ -212,7 +212,7 @@ void evaluate_model(struct NN neurons,
 
 void show_logs(float population_accuracy[POPULATION]){
 
-        for (int32_t p = POPULATION/100; p >= 0; p--){
+        for (int32_t p = POPULATION/400; p >= 0; p--){
             printf("RANKING %i -> %f \t| RANKING %i -> %f \t| RANKING %i -> %f \t| RANKING %i -> %f| RANKING %i -> %f\n"
                             , p, population_accuracy[p]
                             , p + POPULATION/20, population_accuracy[p + POPULATION/20]
@@ -240,4 +240,38 @@ void find_max_min_features(struct feature features[MAX_TEST_SAMPLES],
             }
         }
     }
+}
+
+void crossover_NN(struct NN *parent1, struct NN *parent2, struct NN *child, uint8_t n_features) {
+
+    for (uint32_t layer = 0; layer < N_LAYERS; layer++) {
+        for (uint32_t node = 0; node < n_features; node++) {
+
+            if (rand() % 2) {  
+                child->offsets[layer][node] = parent1->offsets[layer][node];
+            } else {
+                child->offsets[layer][node] = parent2->offsets[layer][node];
+            }
+
+            for (uint32_t weight = 0; weight < n_features; weight++) {
+                if (rand() % 2) {
+                    child->weights[layer][node][weight] = parent1->weights[layer][node][weight];
+                } else {
+                    child->weights[layer][node][weight] = parent2->weights[layer][node][weight];
+                }
+            }
+        }
+    }
+}
+
+void crossover_population(struct NN neurons[POPULATION], uint8_t n_features){
+
+    for (uint32_t p = POPULATION - POPULATION/10; p < POPULATION; p++){
+        int index_mother = rand() % (POPULATION/80);
+        int index_father = rand() % (POPULATION/80) + POPULATION/80;
+
+        crossover_NN(&neurons[index_mother], &neurons[index_father],
+                                &neurons[p], n_features);
+    }
+
 }

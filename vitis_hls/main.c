@@ -45,6 +45,8 @@ int main(){
         mutate_population(neurons, population_accuracy, 
                             max_features, min_features, n_features, 234578);
 
+        crossover_population(neurons, n_features);
+
         gettimeofday(&end_train, NULL);
         show_logs(population_accuracy);
         printf("Execution trainig %fs\n", (end_predictions.tv_sec - init_predictions.tv_sec) + 

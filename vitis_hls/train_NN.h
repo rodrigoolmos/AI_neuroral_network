@@ -11,7 +11,7 @@
 #include "NN.h"
 #include "common.h"
 
-#define POPULATION 1024
+#define POPULATION 1024*10
 #define N_FEATURE 32
 
 void generate_rando_NN(struct NN neurons[POPULATION],
@@ -34,3 +34,5 @@ void find_max_min_features(struct feature features[MAX_TEST_SAMPLES],
                                 float max_features[N_FEATURE], float min_features[N_FEATURE]);
 
 void shuffle(struct feature* array, int n);
+
+void crossover_population(struct NN neurons[POPULATION], uint8_t n_features);
